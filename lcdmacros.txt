@@ -1,0 +1,10 @@
+	
+Clear display screen 01
+Return home 02
+	
+Display ON, cursor blinking 0f
+firstline 0x80
+secline 0xc0
+shift cursor to left 04
+shift cursor to right 06
+wakeup 0x30
