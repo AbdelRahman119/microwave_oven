@@ -71,7 +71,7 @@ int timer;
 	lcdoutput("Popcorn");
 	sw2 = (GPIO_PORTF_DATA_R & 0x01)
 	if(sw2==0) cooking(60);
-
+	//ccvv
 	break; 
 	
 	case 'B':
