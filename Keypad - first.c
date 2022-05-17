@@ -19,7 +19,7 @@ void KEYPAD_INIT(void){
 		GPIO_PORTA_AFSEL_R &= ~0xF0;
 		GPIO_PORTA_DIR_R |= 0x0F;   // to be updated
 		GPIO_PORTA_DEN_R |= 0xF0;
-		GPIO_PORTA_PUR_R &= 0xF0;
+		GPIO_PORTA_PUR_R |= 0xF0;
 	}
 
 void SysTick_wait (unsigned int delay){		//initialization 
