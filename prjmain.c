@@ -1,10 +1,19 @@
 #include "tm4c123gh6pm.h"
 #include "lcdmacros.h"
-#define buzzer GPIO_PORTx_DATA_R  //0x10
+#include "lcd2.h"
+#include "systic.h"
+#include "keypad.h"
+#define readsw1       (GPIO_PORTF_DATA_R & 0x10)
+#define readsw2       (GPIO_PORTF_DATA_R & 0x01)
+#define readDoor  		(GPIO_PORTA_DATA_R & 0x08)
+#define Buzzer				 (GPIO_PORTA_DATA_R)   //pin A2 (0100)
+#define ctoi(c)		(c - '0')
+#define itoc(i)		(i + '0')
 
-char input;
-int sw1,sw2,sw3;
-int timer;
+
+char *dish,input,sw1,sw2,door;
+
+
 void blinking(){
 		int i = 0 ;
 	while(i < 6){
@@ -16,24 +25,45 @@ void blinking(){
 	}
 return;	
 }
-void cooking(timer){
-	int reset = 0;
-	lcd_command(Sec_line);
-	while(timer != 0){
-	if( (sw3 == 1 || sw1 == 0) {						//check for the door and bottun each second
-		pause(timer) ; 	
-		
-	}
-	if (reset == 1) return;
-	lcdoutput(timer);
-	systic_doubledelay(1000);
-	timer--;	
-		
-		
-	}
-	blinking();
-	return;
-	
+
+void cooking(char* dish ,int timer){
+
+	char reset = 0;
+	char i ;
+	LCD_COMMAND(clear);
+	LCD_STRING(dish);
+
+
+	while(timer >= 0){
+			GPIO_PORTF_DATA_R |= 0x0E; //leds are on;
+			LCD_COMMAND(SecondRow);
+			door = readDoor;	
+			sw1 = readsw1;
+
+			lcdTimer(timer);
+			//door = ((GPIO_PORTA_DATA_R & 0x08) >> 3);
+
+			if (timer!= 0 ){
+				for(i=0 ; i<50 ; i++){
+						sw1 = readsw1 ;
+						sw2 = readsw2 ;
+						door = readDoor ;
+						delay_ms(20);							//if door is open door = 1) or sw1 is pressed (sw1=0) pause		
+								if( door == 0 ) reset = pause(sw1) ;
+								if(sw1 == 0) {
+									delay_ms(20);
+									sw1 = readsw1 ;
+									if(sw1 == 0 ) reset = pause(sw1) ;
+								}
+								if (reset == 1) return;
+																		
+				
+			}
+		}
+			timer--;
+
+		}
+	Finish();
 }	
 
 //void cooking(timer){
