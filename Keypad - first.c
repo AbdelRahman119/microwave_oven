@@ -9,7 +9,7 @@ void KEYPAD_INIT(void){
 		GPIO_PORTD_AMSEL_R &= ~0x0F;
 		GPIO_PORTD_PCTL_R &= ~0x0000FFFF;
 		GPIO_PORTD_AFSEL_R &= ~0x0F;
-		GPIO_PORTD_DIR_R |= 0x0F;   // to be updated
+		GPIO_PORTD_DIR_R |= 0x0F;   
 		GPIO_PORTD_DEN_R |= 0x0F;
 		
 		GPIO_PORTA_LOCK_R = 0x4C4F434B;
@@ -17,7 +17,7 @@ void KEYPAD_INIT(void){
 		GPIO_PORTA_AMSEL_R &= ~0xF0;
 		GPIO_PORTA_PCTL_R &= ~0xFFFF0000;
 		GPIO_PORTA_AFSEL_R &= ~0xF0;
-		GPIO_PORTA_DIR_R |= 0x0F;   // to be updated
+		GPIO_PORTA_DIR_R |= 0x0F;   
 		GPIO_PORTA_DEN_R |= 0xF0;
 		GPIO_PORTA_PUR_R |= 0xF0;
 	}
