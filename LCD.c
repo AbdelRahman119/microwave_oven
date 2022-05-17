@@ -46,7 +46,8 @@ void LCD_initialization ()
 	
 		
 		
-		void LCD_DATA (char data){
+void LCD_DATA (char data)
+	{
 		GPIO_PORTE_DATA_R &= ~0x04;
 		GPIO_PORTE_DATA_R |= 0x02;
 		GPIO_PORTB_DATA_R = data;
@@ -54,7 +55,17 @@ void LCD_initialization ()
 		
 		//delay_1ms ( 5 );
 		GPIO_PORTE_DATA_R &= ~0x08;
-		
-		
 	}
+			
+void LCD_STRING (char *String)
+	{
+	while(*String)// will stop when it reaches null terminator
+	          {
+		LCD_DATA(*String);
+		String++;
+	          }
+         }	
+		
+		
+	
 		
