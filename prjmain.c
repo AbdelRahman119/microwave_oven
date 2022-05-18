@@ -175,6 +175,25 @@ lcdoutput("Beef");
 
 }
 	
+		//function to print time on LCD in minutes and seconds
+
+void lcdTimer(int timer){
+
+	int min,sec;
+	char display[6];
+	min = timer/60 ; sec = timer%60;
+	*(display+0) = '0' + (min/10) ; //display digits from left to right & converting to char
+	*(display+1) = '0' + ( min%10);
+	*(display+2) = ':';
+	*(display+3) = '0' + (sec/10) ;
+	*(display+4) = '0' + ( sec%10);
+	*(display+5) = '\0';
+	LCD_COMMAND(SecondRow);
+	LCD_STRING(display);
+}
+
+
+
 	// system initilization 
 		void SystemInit(void){
 
