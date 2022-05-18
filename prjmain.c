@@ -11,6 +11,13 @@
 #define itoc(i)		(i + '0')
 
 
+void SystemInit(void);
+void cooking(char* dish ,int timer);
+char pause(char check);
+void defrosting(char *dish , int weightFactor);
+
+
+
 char *dish,input,sw1,sw2,door;
 
 
@@ -84,6 +91,46 @@ return reset;
 	
 	
 	}
+
+
+//case B and C function to accept weight and print corresponding cooking time
+void defrosting(char *dish , int weightFactor){
+			char weight = 0 ;
+			int timer;
+			LCD_COMMAND(0x01);
+BADR: LCD_STRING(dish);
+			LCD_STRING(" weight?");
+			
+			weight = KEYPAD_READ() ;
+			if( weight < '1' || weight > '9' ){		//if user entered wrong input print err for 1 sec 
+			LCD_COMMAND(0x01);
+			LCD_STRING ("Err");
+			delay_ms(1000);
+			LCD_COMMAND(0x01);
+				goto BADR;
+			}
+			LCD_COMMAND(0x01);
+			LCD_STRING(dish);		//dish name at first line
+			LCD_COMMAND(SecondRow);
+			LCD_STRING("weight is:");
+			LCD_DATA(weight);
+			LCD_STRING("kg");		//entered weight in kg at second line
+			delay_ms(2000);
+			weight = weight - '0';  //converting weight to integer to calculate time
+			timer = weightFactor*weight;
+			LCD_COMMAND(0x01);
+			LCD_STRING ("Close door &");
+			LCD_COMMAND(SecondRow);
+			LCD_STRING ("press sw2");					
+			while( (sw2 != 0) || (door == 0) ){   //if door is closed and switch 2 is pressed begin cooking
+				sw2 = readsw2;
+				door = readDoor;
+			}
+			cooking(dish,timer);
+			return;
+}
+
+
 
 int main(){
 char dish;
