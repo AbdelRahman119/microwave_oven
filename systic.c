@@ -7,7 +7,7 @@ void SysTick_wait (unsigned int delay)
 NVIC_ST_CTRL_R=0x00; //disable systick
 NVIC_ST_RELOAD_R=delay-1; //reload value
 NVIC_ST_CURRENT_R=0; //clear current value
-	
+NVIC_ST_CTRL_R=0x05; //enable systick 	
 
 while((NVIC_ST_CTRL_R&0x00010000)==0){}//wait for count flag;
 } 
