@@ -5,13 +5,13 @@
 
 void LCD_COMMAND ( char com )
 		{
-      GPIO_PORTE_DATA_R &= ~ 0x06;
-			//Rs=0 Rw=0
-			GPIO_PORTB_DATA_R = com;
-		  GPIO_PORTE_DATA_R |= 0x08;
+                GPIO_PORTE_DATA_R &= ~ 0x06;//Rs=0 Rw=0
+	        GPIO_PORTE_DATA_R |= 0x08;
+		GPIO_PORTB_DATA_R = com;
+		 
 
-			//delay_1ms ( 5 );
-		   GPIO_PORTE_DATA_R &=~0x08;
+	         delay_inMilli ( 5 );
+		 GPIO_PORTE_DATA_R &=~0x08;
 		}
 		
 void LCD_initialization ()
@@ -36,11 +36,19 @@ void LCD_initialization ()
 		GPIO_PORTE_DIR_R |= 0x0E;
 		GPIO_PORTE_DEN_R |= 0x0E;
 		
-		LCD_COMMAND (0X30);
-		LCD_COMMAND (0X38);
-		LCD_COMMAND (0X06);
+		delay_inMilli(30)
 		LCD_COMMAND (0X01);
-		LCD_COMMAND (0X0F);
+	        delay_inMilli(15)
+	        LCD_COMMAND (0X30);
+	        delay_inMilli(15)
+		LCD_COMMAND (0X38);
+	        delay_inMilli(15)
+		LCD_COMMAND (0X0E);
+	        delay_inMilli(15)
+		LCD_COMMAND (0X02);
+	        delay_inMilli(15)
+		LCD_COMMAND (0X06);
+	        delay_inMilli(15)
 	}
 	
 	
@@ -48,12 +56,12 @@ void LCD_initialization ()
 		
 void LCD_DATA (char data)
 	{
-		GPIO_PORTE_DATA_R &= ~0x04;
-		GPIO_PORTE_DATA_R |= 0x02;
-		GPIO_PORTB_DATA_R = data;
+		GPIO_PORTE_DATA_R &= ~0x04; //Rw=0
+		GPIO_PORTE_DATA_R |= 0x02;  //Rs=1
 		GPIO_PORTE_DATA_R |= 0x08;
+	        GPIO_PORTB_DATA_R = data;
 		
-		//delay_1ms ( 5 );
+		delay_inMilli(15);
 		GPIO_PORTE_DATA_R &= ~0x08;
 	}
 			
