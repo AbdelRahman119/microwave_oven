@@ -227,15 +227,41 @@ void Finish(){
 
 }
 	
-	
-	
-	
 }	
-	
-	
-	
-	
-	
-	
+
 }	
+// puase function when sw1 is clicked once or the is open
+char pause(char check1){
+		char reset = 0;
+		char i,check2;
+		check2 =1;
+
+		while(1)		//loop that will halt the operation till door is closed sw2 is pressed or sw1 is pressed
+		{	
+			GPIO_PORTF_DATA_R ^= 0x0E; //leds are toggled;
+			for(i=0 ; i<50 ; i++){ // cheacks the switches every 50 ms 
+			sw1 = readsw1 ;
+			sw2 = readsw2 ;
+			door = readDoor ;
+			delay_ms(20);
+			
+			if( (door!=0) && (sw2 == 0) ) return reset; // reset if the door is open and sw1 is pressed 
+			if(sw1 == 0) {
+									delay_ms(100);
+									sw1 = readsw1 ;
+									if(sw1 == 0 ) {
+											check2 = 0 ;
+											if(check1 == 0) return 1;
+											if(check2 == 0) return 1;
+											//check2 = sw1;
+												
+								}
+							}
+				
+		}
+			
+	}
+		
+
+}
 
