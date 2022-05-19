@@ -15,7 +15,7 @@ void SystemInit(void);
 void cooking(char* dish ,int timer);
 char pause(char check);
 void defrosting(char *dish , int weightFactor);
-
+int customTimer(void);
 
 
 char *dish,input,sw1,sw2,door;
@@ -33,45 +33,7 @@ void blinking(){
 return;	
 }
 
-void cooking(char* dish ,int timer){
 
-	char reset = 0;
-	char i ;
-	LCD_COMMAND(clear);
-	LCD_STRING(dish);
-
-
-	while(timer >= 0){
-			GPIO_PORTF_DATA_R |= 0x0E; //leds are on;
-			LCD_COMMAND(SecondRow);
-			door = readDoor;	
-			sw1 = readsw1;
-
-			lcdTimer(timer);
-			//door = ((GPIO_PORTA_DATA_R & 0x08) >> 3);
-
-			if (timer!= 0 ){
-				for(i=0 ; i<50 ; i++){
-						sw1 = readsw1 ;
-						sw2 = readsw2 ;
-						door = readDoor ;
-						delay_ms(20);							//if door is open door = 1) or sw1 is pressed (sw1=0) pause		
-								if( door == 0 ) reset = pause(sw1) ;
-								if(sw1 == 0) {
-									delay_ms(20);
-									sw1 = readsw1 ;
-									if(sw1 == 0 ) reset = pause(sw1) ;
-								}
-								if (reset == 1) return;
-																		
-				
-			}
-		}
-			timer--;
-
-		}
-	Finish();
-}	
 
 //void cooking(timer){
 
@@ -174,7 +136,44 @@ lcdoutput("Beef");
 		
 
 }
-	
+
+void cooking(char* dish ,int timer){
+	char reset = 0;
+	char i ;
+	LCD_COMMAND(clear);
+	LCD_STRING(dish);
+	while(timer >= 0){
+			GPIO_PORTF_DATA_R |= 0x0E; //leds are on;
+			door = readDoor;	
+			sw1 = readsw1;
+			lcdTimer(timer);
+			if (timer!= 0 ){
+				for(i=0 ; i<39 ; i++){
+						sw1 = readsw1 ;
+						sw2 = readsw2 ;
+						door = readDoor ;
+						delay_ms(20);							//if door is open door = 1) or sw1 is pressed (sw1=0) pause		
+								if( door == 0 ) reset = pause(sw1) ;
+								if(sw1 == 0) {			//solving debouncing problem
+									delay_ms(20);
+									sw1 = readsw1 ;
+									if(sw1 == 0 ) reset = pause(sw1) ;
+								}
+								if (reset == 1) return;
+																		
+				
+			}
+		}
+			timer--;
+
+		}
+	Finish();
+}	
+		
+		
+		
+		
+		
 		// system initilization 
 		void SystemInit(void){
 
@@ -239,7 +238,7 @@ char pause(char check1){
 		while(1)		//loop that will halt the operation till door is closed sw2 is pressed or sw1 is pressed
 		{	
 			GPIO_PORTF_DATA_R ^= 0x0E; //leds are toggled;
-			for(i=0 ; i<50 ; i++){ // cheacks the switches every 50 ms 
+			for(i=0 ; i<50 ; i++){ // cheacks the switches every 20 ms 
 			sw1 = readsw1 ;
 			sw2 = readsw2 ;
 			door = readDoor ;
@@ -264,4 +263,42 @@ char pause(char check1){
 		
 
 }
+
+int customTimer(){
+ERR:	LCD_COMMAND(1);
+			LCD_STRING ("Cooking time? ");
+			delay_ms(1000);
+			LCD_COMMAND(1);
+			char display[6];     //initialize display with "00:00"
+			*(display+0) = '0' ;
+			*(display+1) = '0';
+			*(display+2) = ':';
+			*(display+3) = '0' ;
+			*(display+4) = '0';
+			*(display+5) = '\0';
+			char check ;
+			int i,min,sec,timer;
+			i = 4 ;
+			LCD_COMMAND(1);
+				
+		while(i>=0 ){				
+		check = KEYPAD_READ();
+		if(check == 1)	break;		//if sw2 is pressed exit	
+		if(check == 0) goto ERR;	//if sw1 is pressed reset
+		LCD_COMMAND(1);
+		display[0] = display[1];
+    		display[1] = display[3];
+    		display[3] = display[4];
+    		display[4] = check;		//shifting the input time where the new value is entered from the right
+		LCD_STRING(display);
+		LCD_COMMAND(SecondRow);
+		LCD_STRING("sw2 to enter");
+
+
+			i--;
+			
+	}
+}
+
+
 
