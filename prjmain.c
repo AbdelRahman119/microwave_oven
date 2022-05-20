@@ -127,8 +127,14 @@ lcdoutput("Beef");
 	timer = 12*weight;
 
 	break; 
-	case 'D':
-
+	
+	case 'D':	
+											
+	timer = customTimer();
+	LCD_COMMAND(1);
+	LCD_STRING ("sw2 to start");
+	while(sw2 != 0) sw2 = readsw2;
+	cooking("cooking time:" , timer );
 
 	break; 
 	
