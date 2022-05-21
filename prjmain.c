@@ -12,6 +12,8 @@
 
 
 void SystemInit(void);
+void lcdTimer(int timer);
+void Finish(void);
 void cooking(char* dish ,int timer);
 char pause(char check);
 void defrosting(char *dish , int weightFactor);
@@ -21,25 +23,83 @@ int customTimer(void);
 char *dish,input,sw1,sw2,door;
 
 
-void blinking(){
-		int i = 0 ;
-	while(i < 6){
-	GPIO_PORTF_DATA_R=GPIO_PORTF_DATA_R ^0x0E; //togglo PF 1,2,3
-	buzzer ^= 0x10;
-	genericDelay(1000);
-		i++;
-		
-	}
-return;	
+
+int main(){
+
+	  SysTick_Init();
+    LCD_initialization ();
+	  KEYPAD_INIT();
+    SystemInit();
+    LCD_COMMAND (0X01);
+
+		timer = 0;
+	while(1){
+			sw1 =1; sw2=1 ; door = 0;
+			SystemInit();
+			LCD_COMMAND (clear);
+			LCD_STRING("Please, choose");
+			LCD_COMMAND (SecondRow);
+			LCD_STRING( "from A,B,C,D:" );
+			input = KEYPAD_READ();		//read from keypad a,b,c,d
+			
+			switch(input){
+					case 'A':	
+							LCD_DATA(input);
+							delay_ms(1000);
+							LCD_COMMAND(1);
+							LCD_STRING ("Close door &");
+							LCD_COMMAND(SecondRow);
+							LCD_STRING ("press sw2");
+							dish = "POPCORN" ;
+							while( (sw2 != 0) || (door == 0) ){
+							sw2 = readsw2;
+							door = readDoor;
+							}
+							cooking(dish ,60); 
+
+							break;
+
+					case 'B':
+							LCD_DATA(input );
+							delay_ms(1000);
+							dish = "Beef";
+							defrosting(dish,30);
+							break;
+
+					case 'C':
+							LCD_DATA(input );
+							delay_ms(1000);
+							dish = "chicken";
+							defrosting(dish,12);
+							break;
+	
+					case 'D':	
+											
+							timer = customTimer();
+							LCD_COMMAND(1);
+							LCD_STRING ("sw2 to start");
+							while(sw2 != 0) sw2 = readsw2;
+							cooking("cooking time:" , timer );
+	
+							break; 
+	
+					default:
+					{
+							LCD_COMMAND(clear);
+							dish = "invalid input";
+							LCD_STRING(dish);
+							delay_ms(1000);
+					}
+
+	GPIO_PORTF_DATA_R &= ~(0x0E); //leds off when stopped;
+	delay_ms(50);
+}
+
 }
 
 
 
-//void cooking(timer){
 
-//	countdownLcd(timer);
-//	return;
-//}
 	void pause(timer){
 int reset = 0;		
 		while( (( s3 != 0) & ( sw2 !=0 ) ) | sw1 != 1 )
@@ -94,54 +154,7 @@ BADR: LCD_STRING(dish);
 
 
 
-int main(){
-char dish;
-int weight;	
-int timer;
-	while(1){
-	lcdoutput("Please, choose from A,B,C,D");
-	input = readKeypad();		//read from keypad a,b,c,d
-	sw1_2 = readSwitch1_2(); 	
-	sw3 = checkDoor();
 
-		switch(input){
-	case 'A':
-		
-	lcdoutput("Popcorn");
-	sw2 = (GPIO_PORTF_DATA_R & 0x01)
-	if(sw2==0) cooking(60);
-	//ccvv
-	break; 
-	
-	case 'B':
-lcdoutput("Beef");		
-	
-	weight = readweight();
-	timer = 30*weight;
-	Lcd();
-	
-	case 'C':
-  lcdoutput("Beef");		
-	
-	weight = readweight();
-	timer = 12*weight;
-
-	break; 
-	
-	case 'D':	
-											
-	timer = customTimer();
-	LCD_COMMAND(1);
-	LCD_STRING ("sw2 to start");
-	while(sw2 != 0) sw2 = readsw2;
-	cooking("cooking time:" , timer );
-
-	break; 
-	
-	default:
-		
-
-}
 
 void cooking(char* dish ,int timer){
 	char reset = 0;
