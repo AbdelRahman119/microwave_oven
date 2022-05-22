@@ -1,25 +1,31 @@
 #include "tm4c123gh6pm.h"
+#include "systic.h"
+#include "keypad.h"
+#include "lcd2.h"
+#define readsw1		(GPIO_PORTF_DATA_R & 0x10)
+#define readsw2		(GPIO_PORTF_DATA_R & 0x01)
 
 void KEYPAD_INIT(void){
 	
-	SYSCTL_RCGCGPIO_R |= 0x09;
-	while((SYSCTL_PRGPIO_R & 0x09) == 0){};
+	SYSCTL_RCGCGPIO_R |= 0x05;
+	while((SYSCTL_PRGPIO_R & 0x05) == 0){};
 		GPIO_PORTC_LOCK_R = 0x4C4F434B;
 		GPIO_PORTC_CR_R |= 0x0F;
-		GPIO_PORTC_AMSEL_R &= ~0x0F;
-		GPIO_PORTC_PCTL_R &= ~0x0000FFFF;
-		GPIO_PORTC_AFSEL_R &= ~0x0F;
-		GPIO_PORTC_DIR_R |= 0x0F;   
-		GPIO_PORTC_DEN_R |= 0x0F;
+		GPIO_PORTC_AMSEL_R &= ~0xF0;
+		GPIO_PORTC_PCTL_R &= ~0xFFFF0000;
+		GPIO_PORTC_AFSEL_R &= ~0xF0;
+		GPIO_PORTC_DIR_R |= 0xF0;   
+		GPIO_PORTC_DEN_R |= 0xF0;
 		
 		GPIO_PORTA_LOCK_R = 0x4C4F434B;
-		GPIO_PORTA_CR_R |= 0xF0;
-		GPIO_PORTA_AMSEL_R &= ~0xF0;
-		GPIO_PORTA_PCTL_R &= ~0xFFFF0000;
-		GPIO_PORTA_AFSEL_R &= ~0xF0;
-		GPIO_PORTA_DIR_R |= 0x0F;   
-		GPIO_PORTA_DEN_R |= 0xF0;
-		GPIO_PORTA_PUR_R |= 0xF0;
+		GPIO_PORTA_CR_R |= 0xFF;
+		GPIO_PORTA_AMSEL_R &= ~0xFF;
+		GPIO_PORTA_PCTL_R &= ~0xFFFFFFFF;
+		GPIO_PORTA_AFSEL_R &= ~0xFF;
+		GPIO_PORTA_DIR_R |= 0x07;   
+		GPIO_PORTA_DEN_R |= 0xFF;
+		GPIO_PORTA_PUR_R |= 0xF8;
+		GPIO_PORTA_DATA_R &= ~(0x04);
 	}
 
 void SysTick_wait (unsigned int delay){		//initialization 
