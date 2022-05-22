@@ -75,13 +75,21 @@ int main(){
 	
 					case 'D':	
 											
-							timer = customTimer();
-							LCD_COMMAND(1);
-							LCD_STRING ("sw2 to start");
-							while(sw2 != 0) sw2 = readsw2;
-							cooking("cooking time:" , timer );
-	
-							break; 
+											 LCD_DATA(input );
+											 delay_ms(1000);
+											 timer = customTimer();
+											 LCD_COMMAND(1);
+											 LCD_STRING ("Close door &");
+											 LCD_COMMAND(SecondRow);
+											 LCD_STRING ("press sw2");
+												while( (sw2 != 0) || (door == 0) ){
+													sw2 = readsw2;
+													door = readDoor;
+												}
+										   cooking("cooking time:" , timer );
+
+
+						break;
 	
 					default:
 					{
