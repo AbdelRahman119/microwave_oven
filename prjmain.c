@@ -1,6 +1,6 @@
 #include "tm4c123gh6pm.h"
 #include "lcdmacros.h"
-#include "lcd2.h"
+#include "LCD.h"
 #include "systic.h"
 #include "keypad.h"
 #define readsw1       (GPIO_PORTF_DATA_R & 0x10)
@@ -16,12 +16,12 @@ void lcdTimer(int timer);
 void Finish(void);
 void cooking(char* dish ,int timer);
 char pause(char check);
-void defrosting(char *dish , int weightFactor);
+int defrosting(char *dish , int weightFactor);
 int customTimer(void);
 
 
 char *dish,input,sw1,sw2,door;
-
+int timer;
 
 
 int main(){
@@ -63,14 +63,32 @@ int main(){
 							LCD_DATA(input );
 							delay_ms(1000);
 							dish = "Beef";
-							defrosting(dish,30);
+							timer = defrosting(dish,30);
+							LCD_COMMAND(0x01);
+							LCD_STRING ("Close door &");
+							LCD_COMMAND(SecondRow);
+							LCD_STRING ("press sw2");					
+							while( (sw2 != 0) || (door == 0) ){   //if door is closed and switch 2 is pressed begin cooking
+									sw2 = readsw2;
+									door = readDoor;
+									}
+							cooking(dish,timer);
 							break;
 
 					case 'C':
 							LCD_DATA(input );
 							delay_ms(1000);
 							dish = "chicken";
-							defrosting(dish,12);
+							timer = defrosting(dish,12);
+							LCD_COMMAND(0x01);
+							LCD_STRING ("Close door &");
+							LCD_COMMAND(SecondRow);
+							LCD_STRING ("press sw2");					
+							while( (sw2 != 0) || (door == 0) ){   //if door is closed and switch 2 is pressed begin cooking
+									sw2 = readsw2;
+									door = readDoor;
+									}
+							cooking(dish,timer);
 							break;
 	
 					case 'D':	
@@ -108,27 +126,11 @@ int main(){
 
 
 
-	void pause(timer){
-int reset = 0;		
-		while( (( s3 != 0) & ( sw2 !=0 ) ) | sw1 != 1 )
-		{
-			lcdoutput(timer);
-			sw1 = (GPIO_PORTF_DATA_R & 0x10);
-			sw3 = (GPIO_PORTB_DATA_R & 0x10);
-		}	;
-if(sw1 ==1 ) reset = 1;		
-return reset;		
-	
-	
-	}
-
-
-//case B and C function to accept weight and print corresponding cooking time
-void defrosting(char *dish , int weightFactor){
+//case B and C function to accept weight and print corresponding cooking time and represents cooking state
+int defrosting(char *dish , int weightFactor){
 			char weight = 0 ;
-			int timer;
 			LCD_COMMAND(0x01);
-BADR: LCD_STRING(dish);
+BADR: 			LCD_STRING(dish);
 			LCD_STRING(" weight?");
 			
 			weight = KEYPAD_READ() ;
@@ -147,24 +149,14 @@ BADR: LCD_STRING(dish);
 			LCD_STRING("kg");		//entered weight in kg at second line
 			delay_ms(2000);
 			weight = weight - '0';  //converting weight to integer to calculate time
-			timer = weightFactor*weight;
-			LCD_COMMAND(0x01);
-			LCD_STRING ("Close door &");
-			LCD_COMMAND(SecondRow);
-			LCD_STRING ("press sw2");					
-			while( (sw2 != 0) || (door == 0) ){   //if door is closed and switch 2 is pressed begin cooking
-				sw2 = readsw2;
-				door = readDoor;
-			}
-			cooking(dish,timer);
-			return;
+			return (weightFactor*weight);
 }
 
 
 
 
 
-void cooking(char* dish ,int timer){
+void cooking(char* dish ,int timer){   //cooking state
 	char reset = 0;
 	char i ;
 	LCD_COMMAND(clear);
@@ -239,7 +231,7 @@ void lcdTimer(int timer){
 	
 /// function to blink when cooking is done
 
-void Finish(){
+void Finish(){  //finish state
 		int i = 0 ;
 		LCD_COMMAND(clear);
 		LCD_STRING("HAPPY MEAL");
@@ -256,7 +248,7 @@ void Finish(){
 }	
 
 }	
-// puase function when sw1 is clicked once or the is open
+// puase function when sw1 is clicked once or the is open  reprents pause state
 char pause(char check1){
 		char reset = 0;
 		char i,check2;
@@ -291,7 +283,7 @@ char pause(char check1){
 
 }
 
-int customTimer(){
+int customTimer(){    //input state to take input in case D
 ERR:	LCD_COMMAND(1);
 			LCD_STRING ("Cooking time? ");
 			delay_ms(1000);
@@ -325,6 +317,23 @@ ERR:	LCD_COMMAND(1);
 			i--;
 			
 	}
+		if( ( (display[0] >= '3') &&  (display[1] >= '5') ) || (display[3] >= '5') ) {
+				LCD_COMMAND(1);
+				LCD_STRING("Invalid time");
+				delay_ms(1000);
+				goto ERR;
+			
+				}
+
+
+	min = ctoi(display[0])*10 + ctoi(display[1]);
+	sec = ctoi(display[3])*10 + ctoi(display[4]);
+
+	timer = min*60 + sec;
+	if(i==0)delay_ms(1000);
+	return(timer);
+
+
 }
 
 
